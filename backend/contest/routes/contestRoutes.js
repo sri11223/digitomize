@@ -7,17 +7,24 @@ const router = Router();
 router.get("/", async (req, res) => {
   try {
     let host = req.query.host;
+    let platform = req.query.platform;
     let vanity = req.query.vanity;
 
     if (host) {
       host = host.toLowerCase();
     }
 
+    if (platform) {
+      platform = platform.toLowerCase();
+    }
+
     if (vanity) {
       vanity = vanity.toLowerCase();
     }
 
-    const platformArray = host ? host.split(",") : [];
+    // Support both 'host' and 'platform' parameters for backward compatibility
+    const filterParam = platform || host;
+    const platformArray = filterParam ? filterParam.split(",") : [];
     // const vanityArray = vanity ? vanity.split(",") : [];
 
     const contests = await contestController.getContestList();
@@ -36,7 +43,7 @@ router.get("/", async (req, res) => {
           results: [],
         });
       }
-    } else if (host) {
+    } else if (filterParam) {
       const filteredContests = contests.filter((contest) => {
         return platformArray.includes(contest.host);
       });
