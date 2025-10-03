@@ -52,7 +52,7 @@ function ChallengesFilter() {
     // Fetch data from the backend API
     const selectedPlatformsParam = selectedPlatforms.join(",");
     const url = selectedPlatformsParam
-      ? `${backendUrl}/contests?host=${selectedPlatformsParam}`
+      ? `${backendUrl}/contests?platform=${selectedPlatformsParam}`
       : `${backendUrl}/contests`;
 
     fetch(url)

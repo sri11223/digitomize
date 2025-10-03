@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import formbricks from "@formbricks/js/website";
 
 const handleClick = () => {
@@ -74,11 +75,22 @@ function Filter() {
   const [open, setOpen] = useState(false);
   const [range, setRange] = useState([0, 0]);
   const [maxValue, setMaxValue] = useState(Number);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Initialize selected platforms from URL parameters
+  useEffect(() => {
+    const platformParam = searchParams.get('platform');
+    if (platformParam) {
+      const platformsFromUrl = platformParam.split(',').filter(p => platforms.includes(p));
+      setSelectedPlatforms(platformsFromUrl);
+    }
+  }, []);
+
   useEffect(() => {
     // Fetch data from the backend API
     const selectedPlatformsParam = selectedPlatforms.join(",");
     const url = selectedPlatformsParam
-      ? `${backendUrl}/contests?host=${selectedPlatformsParam}`
+      ? `${backendUrl}/contests?platform=${selectedPlatformsParam}`
       : `${backendUrl}/contests`;
       
     fetch(url)
@@ -102,10 +114,25 @@ function Filter() {
       (platform) => platform != value,
     );
     setSelectedPlatforms(newSelectedParams);
+    
+    // Update URL parameters
+    if (newSelectedParams.length > 0) {
+      setSearchParams({ platform: newSelectedParams.join(',') });
+    } else {
+      setSearchParams({});
+    }
   };
   const handleChange = (e) => {
-    setSelectedPlatforms(e.target.value);
+    const newSelectedPlatforms = e.target.value;
+    setSelectedPlatforms(newSelectedPlatforms);
     setOpen(!open);
+    
+    // Update URL parameters
+    if (newSelectedPlatforms.length > 0) {
+      setSearchParams({ platform: newSelectedPlatforms.join(',') });
+    } else {
+      setSearchParams({});
+    }
   };
   return (
     <>
